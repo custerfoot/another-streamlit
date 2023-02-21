@@ -57,7 +57,7 @@ class HeadingMixin:
               where ``color`` needs to be replaced with any of the following
               supported colors: blue, green, orange, red, violet.
 
-        anchor : str
+        anchor : str or False
             The anchor name of the header that can be accessed with #anchor
             in the URL. If omitted, it generates an anchor using the body.
             If False, the anchor is not shown in the UI.
@@ -100,7 +100,7 @@ class HeadingMixin:
               where ``color`` needs to be replaced with any of the following
               supported colors: blue, green, orange, red, violet.
 
-        anchor : str
+        anchor : str or False
             The anchor name of the header that can be accessed with #anchor
             in the URL. If omitted, it generates an anchor using the body.
             If False, the anchor is not shown in the UI.
@@ -146,7 +146,7 @@ class HeadingMixin:
               where ``color`` needs to be replaced with any of the following
               supported colors: blue, green, orange, red, violet.
 
-        anchor : str
+        anchor : str or False
             The anchor name of the header that can be accessed with #anchor
             in the URL. If omitted, it generates an anchor using the body.
             If False, the anchor is not shown in the UI.
