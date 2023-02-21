@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, Union, cast
 
+from typing_extensions import Literal
+
+from streamlit.errors import StreamlitAPIException
 from streamlit.proto.Heading_pb2 import Heading as HeadingProto
 from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.string_util import clean_text
@@ -30,7 +33,7 @@ SUBHEADER_TAG = "h3"
 class HeadingMixin:
     @gather_metrics("header")
     def header(
-        self, body: SupportsStr, anchor: Optional[str] = None
+        self, body: SupportsStr, anchor: Union[None, str, Literal[False]] = None
     ) -> "DeltaGenerator":
         """Display text in header formatting.
 
@@ -57,6 +60,7 @@ class HeadingMixin:
         anchor : str
             The anchor name of the header that can be accessed with #anchor
             in the URL. If omitted, it generates an anchor using the body.
+            If False, the anchor is not shown in the UI.
 
         Examples
         --------
@@ -67,15 +71,12 @@ class HeadingMixin:
 
         """
         header_proto = HeadingProto()
-        if anchor is not None:
-            header_proto.anchor = anchor
-        header_proto.body = clean_text(body)
-        header_proto.tag = HEADER_TAG
+        marshall(header_proto, body=body, anchor=anchor, tag=HEADER_TAG)
         return self.dg._enqueue("heading", header_proto)
 
     @gather_metrics("subheader")
     def subheader(
-        self, body: SupportsStr, anchor: Optional[str] = None
+        self, body: SupportsStr, anchor: Union[None, str, Literal[False]] = None
     ) -> "DeltaGenerator":
         """Display text in subheader formatting.
 
@@ -102,6 +103,7 @@ class HeadingMixin:
         anchor : str
             The anchor name of the header that can be accessed with #anchor
             in the URL. If omitted, it generates an anchor using the body.
+            If False, the anchor is not shown in the UI.
 
         Examples
         --------
@@ -112,16 +114,12 @@ class HeadingMixin:
 
         """
         subheader_proto = HeadingProto()
-        if anchor is not None:
-            subheader_proto.anchor = anchor
-        subheader_proto.body = clean_text(body)
-        subheader_proto.tag = SUBHEADER_TAG
-
+        marshall(subheader_proto, body=body, anchor=anchor, tag=SUBHEADER_TAG)
         return self.dg._enqueue("heading", subheader_proto)
 
     @gather_metrics("title")
     def title(
-        self, body: SupportsStr, anchor: Optional[str] = None
+        self, body: SupportsStr, anchor: Union[None, str, Literal[False]] = None
     ) -> "DeltaGenerator":
         """Display text in title formatting.
 
@@ -151,6 +149,7 @@ class HeadingMixin:
         anchor : str
             The anchor name of the header that can be accessed with #anchor
             in the URL. If omitted, it generates an anchor using the body.
+            If False, the anchor is not shown in the UI.
 
         Examples
         --------
@@ -161,14 +160,32 @@ class HeadingMixin:
 
         """
         title_proto = HeadingProto()
-        if anchor is not None:
-            title_proto.anchor = anchor
-        title_proto.body = clean_text(body)
-        title_proto.tag = TITLE_TAG
-
+        marshall(title_proto, body=body, anchor=anchor, tag=TITLE_TAG)
         return self.dg._enqueue("heading", title_proto)
 
     @property
     def dg(self) -> "DeltaGenerator":
         """Get our DeltaGenerator."""
         return cast("DeltaGenerator", self)
+
+
+def marshall(
+    heading_proto: HeadingProto,
+    *,
+    body,
+    anchor: Union[None, str, Literal[False]],
+    tag: str,
+):
+    """Marshall heading's data into proto."""
+    if anchor is not None:
+        if anchor is False:
+            heading_proto.hide_anchor = True
+        elif isinstance(anchor, str):
+            heading_proto.anchor = anchor
+        else:
+            raise StreamlitAPIException(
+                "Anchor parameter has invalid value: %s" % anchor
+            )
+
+    heading_proto.body = clean_text(body)
+    heading_proto.tag = tag

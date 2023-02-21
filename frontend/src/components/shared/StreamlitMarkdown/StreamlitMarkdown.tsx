@@ -15,13 +15,13 @@
  */
 
 import React, {
+  CSSProperties,
+  Fragment,
+  FunctionComponent,
+  HTMLProps,
+  PureComponent,
   ReactElement,
   ReactNode,
-  PureComponent,
-  CSSProperties,
-  HTMLProps,
-  FunctionComponent,
-  Fragment,
 } from "react"
 import { visit } from "unist-util-visit"
 import { useTheme } from "@emotion/react"
@@ -53,11 +53,11 @@ import {
 } from "src/theme/index"
 
 import {
-  StyledStreamlitMarkdown,
-  StyledLinkIconContainer,
-  StyledLinkIcon,
-  StyledHeaderContent,
   StyledHeaderContainer,
+  StyledHeaderContent,
+  StyledLinkIcon,
+  StyledLinkIconContainer,
+  StyledStreamlitMarkdown,
 } from "./styled-components"
 
 import "katex/dist/katex.min.css"
@@ -134,6 +134,7 @@ const scrollNodeIntoView = once((node: HTMLElement): void => {
 interface HeadingWithAnchorProps {
   tag: string
   anchor?: string
+  hideAnchor?: boolean
   children: ReactNode[] | ReactNode
   tagProps?: HTMLProps<HTMLHeadingElement>
 }
@@ -146,6 +147,7 @@ export interface HeadingProtoProps {
 export const HeadingWithAnchor: FunctionComponent<HeadingWithAnchorProps> = ({
   tag,
   anchor: propsAnchor,
+  hideAnchor,
   children,
   tagProps,
 }) => {
@@ -194,7 +196,7 @@ export const HeadingWithAnchor: FunctionComponent<HeadingWithAnchorProps> = ({
     tag,
     { ...tagProps, ref, id: elementId },
     <StyledLinkIconContainer>
-      {elementId && (
+      {elementId && !hideAnchor && (
         <StyledLinkIcon href={`#${elementId}`}>
           <LinkIcon size="18" />
         </StyledLinkIcon>
@@ -447,7 +449,7 @@ function makeMarkdownHeading(tag: string, markdown: string): string {
 
 export function Heading(props: HeadingProtoProps): ReactElement {
   const { width } = props
-  const { tag, anchor, body } = props.element
+  const { tag, anchor, body, hideAnchor } = props.element
   const isSidebar = React.useContext(IsSidebarContext)
   // st.header can contain new lines which are just interpreted as new
   // markdown to be rendered as such.
@@ -462,7 +464,7 @@ export function Heading(props: HeadingProtoProps): ReactElement {
         data-testid="stMarkdownContainer"
       >
         <StyledHeaderContainer>
-          <HeadingWithAnchor tag={tag} anchor={anchor}>
+          <HeadingWithAnchor tag={tag} anchor={anchor} hideAnchor={hideAnchor}>
             <RenderedMarkdown
               source={makeMarkdownHeading(tag, heading)}
               allowHTML={false}
