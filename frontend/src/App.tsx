@@ -24,7 +24,7 @@ import classNames from "classnames"
 import AppContext from "src/components/core/AppContext"
 import AppView from "src/components/core/AppView"
 import StatusWidget from "src/components/core/StatusWidget"
-import MainMenu, { isLocalhost } from "src/components/core/MainMenu"
+import MainMenu from "src/components/core/MainMenu"
 import ToolbarActions from "src/components/core/ToolbarActions"
 import Header from "src/components/core/Header"
 import {
@@ -113,6 +113,7 @@ import withScreencast, {
 // Used to import fonts + responsive reboot items
 import "src/assets/css/theme.scss"
 import { ensureError } from "./lib/ErrorHandling"
+import { isLocalhost } from "./components/core/MainMenu/MainMenu"
 
 export interface Props {
   screenCast: ScreenCastHOC
@@ -141,6 +142,7 @@ interface State {
   allowRunOnSave: boolean
   scriptFinishedHandlers: (() => void)[]
   developerMode: boolean
+  toolbarMode: Config.ToolbarMode
   themeHash: string | null
   gitInfo: IGitInfo | null
   formsData: FormsData
@@ -226,6 +228,7 @@ export class App extends PureComponent<Props, State> {
       // true as well for consistency.
       hideTopBar: true,
       hideSidebarNav: true,
+      toolbarMode: Config.ToolbarMode.MINIMAL,
       latestRunTime: performance.now(),
     }
 
@@ -749,6 +752,7 @@ export class App extends PureComponent<Props, State> {
         allowRunOnSave: config.allowRunOnSave,
         hideTopBar: config.hideTopBar,
         hideSidebarNav: config.hideSidebarNav,
+        toolbarMode: config.toolbarMode,
         appPages: newSessionProto.appPages,
         currentPageScriptHash: newPageScriptHash,
         latestRunTime: performance.now(),
@@ -1481,6 +1485,7 @@ export class App extends PureComponent<Props, State> {
                 loadGitInfo={this.sendLoadGitInfoBackMsg}
                 canDeploy={SessionInfo.isSet() && !SessionInfo.isHello}
                 menuItems={menuItems}
+                toolbarMode={this.state.toolbarMode}
               />
             </Header>
 

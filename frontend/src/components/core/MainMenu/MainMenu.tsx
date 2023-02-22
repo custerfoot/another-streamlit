@@ -43,7 +43,7 @@ import {
   IGuestToHostMessage,
   IMenuItem,
 } from "src/hocs/withHostCommunication/types"
-import { GitInfo, IGitInfo, PageConfig } from "src/autogen/proto"
+import { Config, GitInfo, IGitInfo, PageConfig } from "src/autogen/proto"
 import { MetricsManager } from "src/lib/MetricsManager"
 import { DEPLOY_URL, STREAMLIT_CLOUD_URL } from "src/urls"
 import {
@@ -112,6 +112,8 @@ export interface Props {
   menuItems?: PageConfig.IMenuItems | null
 
   hostIsOwner?: boolean
+
+  toolbarMode: Config.ToolbarMode
 }
 
 const getOpenInWindowCallback = (url: string) => (): void => {
@@ -459,18 +461,24 @@ function MainMenu(props: Props): ReactElement {
 
   const shouldShowHostMenu = !!hostMenuItems.length
   const showDeploy = isLocalhost() && !shouldShowHostMenu && props.canDeploy
-  const preferredMenuOrder: any[] = [
-    coreMenuItems.rerun,
-    coreMenuItems.settings,
-    coreMenuItems.DIVIDER,
-    coreMenuItems.print,
-    coreMenuItems.recordScreencast,
-    coreMenuItems.DIVIDER,
-    coreMenuItems.report,
-    coreMenuItems.community,
-    ...(shouldShowHostMenu ? hostMenuItems : [coreMenuItems.DIVIDER]),
-    coreMenuItems.about,
-  ]
+  let preferredMenuOrder: any[]
+  if (props.toolbarMode == Config.ToolbarMode.MINIMAL) {
+    // If toolbar mode == minimal then show only host menu items if any.
+    preferredMenuOrder = shouldShowHostMenu ? hostMenuItems : []
+  } else {
+    preferredMenuOrder = [
+      coreMenuItems.rerun,
+      coreMenuItems.settings,
+      coreMenuItems.DIVIDER,
+      coreMenuItems.print,
+      coreMenuItems.recordScreencast,
+      coreMenuItems.DIVIDER,
+      coreMenuItems.report,
+      coreMenuItems.community,
+      ...(shouldShowHostMenu ? hostMenuItems : [coreMenuItems.DIVIDER]),
+      coreMenuItems.about,
+    ]
+  }
 
   const preferredDevMenuOrder: any[] = [
     coreDevMenuItems.developerOptions,
@@ -517,6 +525,23 @@ function MainMenu(props: Props): ReactElement {
 
   const { hostIsOwner } = props
 
+  let showDevelopmentMenu: boolean
+  if (props.toolbarMode == Config.ToolbarMode.DEVELOPER) {
+    showDevelopmentMenu = true
+  } else if (
+    props.toolbarMode == Config.ToolbarMode.VIEWER ||
+    props.toolbarMode == Config.ToolbarMode.MINIMAL
+  ) {
+    showDevelopmentMenu = false
+  } else {
+    showDevelopmentMenu = hostIsOwner || isLocalhost()
+  }
+
+  if (menuItems.length == 0 && !showDevelopmentMenu) {
+    // Don't show an empty menu.
+    return <></>
+  }
+
   return (
     <StatefulPopover
       focusLock
@@ -529,7 +554,7 @@ function MainMenu(props: Props): ReactElement {
       content={({ close }) => (
         <>
           <SubMenu menuItems={menuItems} closeMenu={close} isDevMenu={false} />
-          {(hostIsOwner || isLocalhost()) && (
+          {showDevelopmentMenu && (
             <StyledUl>
               <SubMenu
                 menuItems={devMenuItems}
