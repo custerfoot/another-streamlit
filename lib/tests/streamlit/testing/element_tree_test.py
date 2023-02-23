@@ -159,6 +159,21 @@ class MarkdownTest(InteractiveScriptTests):
         assert sr.get("latex")[0].type == "latex"
         assert sr.get("latex")[0].value == "$$\nE=mc^2\n$$"
 
+    def test_divider(self):
+        script = self.script_from_string(
+            "latex_element.py",
+            """
+            import streamlit as st
+
+            st.divider()
+            """,
+        )
+        sr = script.run()
+
+        assert sr.get("divider")
+        assert sr.get("divider")[0].type == "divider"
+        assert sr.get("divider")[0].value == "---"
+
     def test_markdown_elements_by_type(self):
         script = self.script_from_string(
             "markdown_element.py",

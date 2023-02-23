@@ -187,6 +187,13 @@ class Code(Markdown):
         self.type = "code"
 
 
+@dataclass(init=False)
+class Divider(Markdown):
+    def __init__(self, proto: MarkdownProto, root: ElementTree):
+        super().__init__(proto, root)
+        self.type = "divider"
+
+
 @runtime_checkable
 class Widget(Protocol):
     id: str
@@ -719,6 +726,10 @@ class Block:
         ...
 
     @overload
+    def get(self, element_type: Literal["divider"]) -> Sequence[Divider]:
+        ...
+
+    @overload
     def get(self, element_type: Literal["title"]) -> Sequence[Title]:
         ...
 
@@ -874,6 +885,8 @@ def parse_tree_from_messages(messages: list[ForwardMsg]) -> ElementTree:
                     new_node = Latex(elt.markdown, root=root)
                 elif elt.markdown.element_type == MarkdownProto.Type.CODE:
                     new_node = Code(elt.markdown, root=root)
+                elif elt.markdown.element_type == MarkdownProto.Type.DIVIDER:
+                    new_node = Divider(elt.markdown, root=root)
                 else:
                     raise ValueError(
                         f"Unknown markdown type {elt.markdown.element_type}"

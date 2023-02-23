@@ -209,6 +209,24 @@ class MarkdownMixin:
         latex_proto.element_type = MarkdownProto.Type.LATEX
         return self.dg._enqueue("markdown", latex_proto)
 
+    @gather_metrics("divider")
+    def divider(self) -> "DeltaGenerator":
+        """Display horizontal ruler.
+
+        (This is a convenience wrapper around `st.markdown()`)
+
+        Example
+        -------
+        >>> import streamlit as st
+        >>>
+        >>> st.divider()
+
+        """
+        divider_proto = MarkdownProto()
+        divider_proto.body = "---"
+        divider_proto.element_type = MarkdownProto.Type.DIVIDER
+        return self.dg._enqueue("markdown", divider_proto)
+
     @property
     def dg(self) -> "DeltaGenerator":
         """Get our DeltaGenerator."""
