@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, Union, cast
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 from typing_extensions import Literal
 
@@ -29,12 +29,12 @@ TITLE_TAG = "h1"
 HEADER_TAG = "h2"
 SUBHEADER_TAG = "h3"
 
+Anchor = Union[Optional[str], Literal[False]]
+
 
 class HeadingMixin:
     @gather_metrics("header")
-    def header(
-        self, body: SupportsStr, anchor: Union[None, str, Literal[False]] = None
-    ) -> "DeltaGenerator":
+    def header(self, body: SupportsStr, anchor: Anchor = None) -> "DeltaGenerator":
         """Display text in header formatting.
 
         Parameters
@@ -75,9 +75,7 @@ class HeadingMixin:
         return self.dg._enqueue("heading", header_proto)
 
     @gather_metrics("subheader")
-    def subheader(
-        self, body: SupportsStr, anchor: Union[None, str, Literal[False]] = None
-    ) -> "DeltaGenerator":
+    def subheader(self, body: SupportsStr, anchor: Anchor = None) -> "DeltaGenerator":
         """Display text in subheader formatting.
 
         Parameters
@@ -118,9 +116,7 @@ class HeadingMixin:
         return self.dg._enqueue("heading", subheader_proto)
 
     @gather_metrics("title")
-    def title(
-        self, body: SupportsStr, anchor: Union[None, str, Literal[False]] = None
-    ) -> "DeltaGenerator":
+    def title(self, body: SupportsStr, anchor: Anchor = None) -> "DeltaGenerator":
         """Display text in title formatting.
 
         Each document should have a single `st.title()`, although this is not
@@ -182,9 +178,15 @@ def marshall(
             heading_proto.hide_anchor = True
         elif isinstance(anchor, str):
             heading_proto.anchor = anchor
+        elif anchor is True:
+            raise StreamlitAPIException(
+                "Anchor parameter has invalid value: %s. "
+                "Supported values: None, any string or False" % anchor
+            )
         else:
             raise StreamlitAPIException(
-                "Anchor parameter has invalid value: %s" % anchor
+                "Anchor parameter has invalid type: %s. "
+                "Supported values: None, any string or False" % type(anchor).__name__
             )
 
     heading_proto.body = clean_text(body)

@@ -129,5 +129,11 @@ class StTitleTest(DeltaGeneratorTestCase):
 
     def test_st_title_with_invalid_anchor(self):
         """Test st.title with invalid anchor."""
-        with pytest.raises(StreamlitAPIException):
+        with pytest.raises(
+            StreamlitAPIException, match="Anchor parameter has invalid value:"
+        ):
             st.title("some header", anchor=True)
+        with pytest.raises(
+            StreamlitAPIException, match="Anchor parameter has invalid type:"
+        ):
+            st.title("some header", anchor=6)
