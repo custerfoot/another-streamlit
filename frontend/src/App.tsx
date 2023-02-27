@@ -24,7 +24,7 @@ import classNames from "classnames"
 import AppContext from "src/components/core/AppContext"
 import AppView from "src/components/core/AppView"
 import StatusWidget from "src/components/core/StatusWidget"
-import MainMenu from "src/components/core/MainMenu"
+import MainMenu, { isLocalhost } from "src/components/core/MainMenu"
 import ToolbarActions from "src/components/core/ToolbarActions"
 import Header from "src/components/core/Header"
 import {
@@ -113,7 +113,6 @@ import withScreencast, {
 // Used to import fonts + responsive reboot items
 import "src/assets/css/theme.scss"
 import { ensureError } from "./lib/ErrorHandling"
-import { isLocalhost } from "./components/core/MainMenu/MainMenu"
 
 export interface Props {
   screenCast: ScreenCastHOC
