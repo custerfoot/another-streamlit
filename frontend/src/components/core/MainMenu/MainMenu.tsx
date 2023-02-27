@@ -480,12 +480,6 @@ function MainMenu(props: Props): ReactElement {
     ]
   }
 
-  const preferredDevMenuOrder: any[] = [
-    coreDevMenuItems.developerOptions,
-    coreDevMenuItems.clearCache,
-    showDeploy && coreDevMenuItems.deployApp,
-  ]
-
   // Remove empty entries, and add dividers into menu options as needed.
   const menuItems: any[] = []
   let lastMenuItem = null
@@ -503,41 +497,52 @@ function MainMenu(props: Props): ReactElement {
     }
   }
 
-  const devMenuItems: any[] = []
-  let devLastMenuItem = null
-  for (const devMenuItem of preferredDevMenuOrder) {
-    if (devMenuItem) {
-      if (devMenuItem !== coreDevMenuItems.DIVIDER) {
-        if (devLastMenuItem === coreDevMenuItems.DIVIDER) {
-          devMenuItems.push({ ...devMenuItem, hasDividerAbove: true })
-        } else {
-          devMenuItems.push(devMenuItem)
-        }
-      }
+  const { hostIsOwner } = props
 
-      devLastMenuItem = devMenuItem
+  const showDevelopmentMenu = (() => {
+    if (props.toolbarMode == Config.ToolbarMode.DEVELOPER) {
+      return true
+    } else if (
+      props.toolbarMode == Config.ToolbarMode.VIEWER ||
+      props.toolbarMode == Config.ToolbarMode.MINIMAL
+    ) {
+      return false
+    } else {
+      return hostIsOwner || isLocalhost()
+    }
+  })()
+
+  const devMenuItems: any[] = []
+
+  if (showDevelopmentMenu) {
+    const preferredDevMenuOrder: any[] = [
+      coreDevMenuItems.developerOptions,
+      coreDevMenuItems.clearCache,
+      showDeploy && coreDevMenuItems.deployApp,
+    ]
+
+    let devLastMenuItem = null
+
+    for (const devMenuItem of preferredDevMenuOrder) {
+      if (devMenuItem) {
+        if (devMenuItem !== coreDevMenuItems.DIVIDER) {
+          if (devLastMenuItem === coreDevMenuItems.DIVIDER) {
+            devMenuItems.push({ ...devMenuItem, hasDividerAbove: true })
+          } else {
+            devMenuItems.push(devMenuItem)
+          }
+        }
+
+        devLastMenuItem = devMenuItem
+      }
+    }
+
+    if (devLastMenuItem != null) {
+      devLastMenuItem.styleProps = lastDevMenuItemStyleProps
     }
   }
 
-  if (devLastMenuItem != null) {
-    devLastMenuItem.styleProps = lastDevMenuItemStyleProps
-  }
-
-  const { hostIsOwner } = props
-
-  let showDevelopmentMenu: boolean
-  if (props.toolbarMode == Config.ToolbarMode.DEVELOPER) {
-    showDevelopmentMenu = true
-  } else if (
-    props.toolbarMode == Config.ToolbarMode.VIEWER ||
-    props.toolbarMode == Config.ToolbarMode.MINIMAL
-  ) {
-    showDevelopmentMenu = false
-  } else {
-    showDevelopmentMenu = hostIsOwner || isLocalhost()
-  }
-
-  if (menuItems.length == 0 && !showDevelopmentMenu) {
+  if (menuItems.length == 0 && devMenuItems.length == 0) {
     // Don't show an empty menu.
     return <></>
   }
@@ -554,7 +559,7 @@ function MainMenu(props: Props): ReactElement {
       content={({ close }) => (
         <>
           <SubMenu menuItems={menuItems} closeMenu={close} isDevMenu={false} />
-          {showDevelopmentMenu && (
+          {devMenuItems.length != 0 && (
             <StyledUl>
               <SubMenu
                 menuItems={devMenuItems}
