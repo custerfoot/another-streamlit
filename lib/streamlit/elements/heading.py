@@ -29,7 +29,7 @@ TITLE_TAG = "h1"
 HEADER_TAG = "h2"
 SUBHEADER_TAG = "h3"
 
-Anchor = Union[Optional[str], Literal[False]]
+Anchor = Optional[Union[str, Literal[False]]]
 
 
 class HeadingMixin:
