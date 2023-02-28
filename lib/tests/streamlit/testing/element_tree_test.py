@@ -162,7 +162,7 @@ class MarkdownTest(InteractiveScriptTests):
 
     def test_divider(self):
         script = self.script_from_string(
-            "latex_element.py",
+            "divider_element.py",
             """
             import streamlit as st
 
