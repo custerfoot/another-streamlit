@@ -215,7 +215,10 @@ class MarkdownMixin:
     def divider(self) -> "DeltaGenerator":
         """Display horizontal ruler.
 
-        (This is a convenience wrapper around `st.markdown()`)
+        Note that you can achieve the same effect with st.write("---") or
+        even just "---" in your script (via magic).
+
+        (No parameters)
 
         Example
         -------
