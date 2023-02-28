@@ -558,7 +558,13 @@ function MainMenu(props: Props): ReactElement {
       placement={PLACEMENT.bottomRight}
       content={({ close }) => (
         <>
-          <SubMenu menuItems={menuItems} closeMenu={close} isDevMenu={false} />
+          {menuItems.length != 0 && (
+            <SubMenu
+              menuItems={menuItems}
+              closeMenu={close}
+              isDevMenu={false}
+            />
+          )}
           {devMenuItems.length != 0 && (
             <StyledUl>
               <SubMenu
