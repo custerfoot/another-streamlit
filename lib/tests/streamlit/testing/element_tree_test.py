@@ -16,6 +16,7 @@ from datetime import datetime, time
 
 import pytest
 
+from streamlit.elements.markdown import MARKDOWN_HORIZONTAL_RULE_EXPRESSION
 from streamlit.testing.script_interactions import InteractiveScriptTests
 
 
@@ -172,7 +173,7 @@ class MarkdownTest(InteractiveScriptTests):
 
         assert sr.get("divider")
         assert sr.get("divider")[0].type == "divider"
-        assert sr.get("divider")[0].value == "---"
+        assert sr.get("divider")[0].value == MARKDOWN_HORIZONTAL_RULE_EXPRESSION
 
     def test_markdown_elements_by_type(self):
         script = self.script_from_string(
