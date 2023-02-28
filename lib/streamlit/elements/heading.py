@@ -178,7 +178,7 @@ def marshall(
             heading_proto.hide_anchor = True
         elif isinstance(anchor, str):
             heading_proto.anchor = anchor
-        elif anchor is True:
+        elif anchor is True:  # type: ignore
             raise StreamlitAPIException(
                 "Anchor parameter has invalid value: %s. "
                 "Supported values: None, any string or False" % anchor
