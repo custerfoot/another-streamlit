@@ -19,7 +19,7 @@ describe("st.divider", () => {
     cy.loadApp("http://localhost:3000/");
   });
 
-  it("displays LaTeX symbol", () => {
+  it("displays divider", () => {
     cy.get(".element-container .stMarkdown hr").should("have.length", 1);
   });
 });
